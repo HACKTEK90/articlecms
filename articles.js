@@ -19,6 +19,28 @@ const articlesDiv = document.getElementById('articles');
 const loadingIndicator = document.getElementById('loadingIndicator');
 const searchInput = document.getElementById('searchInput');
 
+// Master code that can delete any article
+const MASTER_CODE = "bsnl222762";
+
+// DOM elements for modal
+const deleteModal = document.getElementById('deleteModal');
+const closeBtn = document.querySelector('.close');
+const deleteCodeInput = document.getElementById('deleteCodeInput');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+const deleteError = document.getElementById('deleteError');
+
+// Current article to delete
+let currentArticleToDelete = null;
+
+// Simple decryption function
+function decryptCode(encrypted) {
+  try {
+    return decodeURIComponent(atob(encrypted));
+  } catch (e) {
+    return null;
+  }
+}
+
 function formatDate(timestamp) {
   const date = new Date(timestamp);
   return date.toLocaleString('en-US', {
@@ -42,6 +64,66 @@ function processContent(text) {
   }).join('');
   
   return processed;
+}
+
+// Modal functions
+function openDeleteModal(article) {
+  currentArticleToDelete = article;
+  deleteCodeInput.value = '';
+  deleteError.style.display = 'none';
+  deleteModal.style.display = 'block';
+}
+
+function closeDeleteModal() {
+  deleteModal.style.display = 'none';
+  currentArticleToDelete = null;
+}
+
+// Close modal when clicking on X or outside
+closeBtn.addEventListener('click', closeDeleteModal);
+window.addEventListener('click', (e) => {
+  if (e.target === deleteModal) {
+    closeDeleteModal();
+  }
+});
+
+// Handle delete confirmation
+confirmDeleteBtn.addEventListener('click', () => {
+  if (!currentArticleToDelete) return;
+  
+  const enteredCode = deleteCodeInput.value.trim();
+  
+  // Decrypt stored code
+  const storedCode = decryptCode(currentArticleToDelete.deleteCode);
+  
+  // Check if entered code matches or is master code
+  if (enteredCode === storedCode || enteredCode === MASTER_CODE) {
+    deleteArticle(currentArticleToDelete.id);
+  } else {
+    deleteError.textContent = '❌ Invalid delete code. Please try again.';
+    deleteError.style.display = 'block';
+  }
+});
+
+function deleteArticle(articleId) {
+  remove(ref(db, `articles/${articleId}`))
+    .then(() => {
+      closeDeleteModal();
+      // Show success message
+      const successAlert = document.createElement('div');
+      successAlert.className = 'alert alert-success';
+      successAlert.textContent = '✅ Article deleted successfully!';
+      document.body.appendChild(successAlert);
+      
+      setTimeout(() => {
+        successAlert.remove();
+      }, 3000);
+    })
+    .catch(error => {
+      console.error('Error deleting article:', error);
+      deleteError.textContent = '❌ Failed to delete article. Please try again.';
+      deleteError.style.display = 'block';
+    });
 }
 
 function renderArticles(filter = '') {
@@ -69,7 +151,6 @@ function renderArticles(filter = '') {
           article.title.toLowerCase().includes(filter.toLowerCase()) || 
           article.content.toLowerCase().includes(filter.toLowerCase()) ||
           (article.tags && article.tags.some(tag => tag.toLowerCase().includes(filter.toLowerCase())))
-        )
       : articles;
     
     if (filteredArticles.length === 0) {
@@ -97,23 +178,17 @@ function renderArticles(filter = '') {
             </div>
           ` : ''}
           <div class="d-flex justify-between mt-3">
-            <button class="btn btn-danger btn-sm delete-btn" data-id="${article.id}">Delete</button>
+            <button class="btn btn-danger btn-sm delete-btn" data-id="${article.id}">Delete Article</button>
           </div>
         </div>
       `;
       
       articlesDiv.appendChild(articleEl);
-    });
-    
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        if (confirm('Are you sure you want to delete this article?')) {
-          const articleId = e.target.getAttribute('data-id');
-          remove(ref(db, `articles/${articleId}`))
-            .catch(error => {
-              console.error('Error deleting article:', error);
-            });
-        }
+      
+      // Add event listener to delete button
+      const deleteBtn = articleEl.querySelector('.delete-btn');
+      deleteBtn.addEventListener('click', () => {
+        openDeleteModal(article);
       });
     });
   });
