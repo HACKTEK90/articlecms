@@ -33,6 +33,18 @@
         Loading articles...
       </div>
     </div>
+    
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Delete Article</h3>
+        <p>Enter the delete code for this article:</p>
+        <input type="password" id="deleteCodeInput" placeholder="Enter delete code">
+        <div id="deleteError" class="text-danger" style="display:none; margin-top:10px;"></div>
+        <button id="confirmDeleteBtn" class="btn btn-danger mt-3">Confirm Delete</button>
+      </div>
+    </div>
   </div>
 
   <script src="articles.js" type="module"></script>
