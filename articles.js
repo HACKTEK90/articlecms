@@ -69,6 +69,7 @@ function renderArticles(filter = '') {
           article.title.toLowerCase().includes(filter.toLowerCase()) || 
           article.content.toLowerCase().includes(filter.toLowerCase()) ||
           (article.tags && article.tags.some(tag => tag.toLowerCase().includes(filter.toLowerCase())))
+        )
       : articles;
     
     if (filteredArticles.length === 0) {
@@ -104,7 +105,6 @@ function renderArticles(filter = '') {
       articlesDiv.appendChild(articleEl);
     });
     
-    // Add delete button event listeners
     document.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         if (confirm('Are you sure you want to delete this article?')) {
