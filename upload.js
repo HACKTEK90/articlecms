@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
@@ -13,10 +14,16 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getDatabase(app);
 const uploadForm = document.getElementById('uploadForm');
 const alertContainer = document.getElementById('alertContainer');
 const submitBtn = document.getElementById('submitBtn');
+
+// Simple encryption function (for basic obfuscation)
+function encryptCode(code) {
+  return btoa(encodeURIComponent(code));
+}
 
 function showAlert(message, type = 'success') {
   const alertEl = document.createElement('div');
@@ -38,6 +45,16 @@ function showAlert(message, type = 'success') {
   }, 5000);
 }
 
+// Authenticate anonymously
+signInAnonymously(auth)
+  .then(() => {
+    console.log("Authenticated anonymously");
+  })
+  .catch((error) => {
+    console.error("Authentication error:", error);
+    showAlert('Authentication failed. Please refresh the page.', 'error');
+  });
+
 uploadForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   
@@ -45,9 +62,15 @@ uploadForm.addEventListener('submit', async (e) => {
   const author = document.getElementById('author').value.trim();
   const tags = document.getElementById('tags').value.trim();
   const content = document.getElementById('content').value.trim();
+  const deleteCode = document.getElementById('deleteCode').value.trim();
   
-  if (!title || !author || !content) {
+  if (!title || !author || !content || !deleteCode) {
     showAlert('Please fill in all required fields', 'error');
+    return;
+  }
+  
+  if (deleteCode.length < 6) {
+    showAlert('Delete code must be at least 6 characters', 'error');
     return;
   }
   
@@ -55,22 +78,26 @@ uploadForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Publishing...';
     
+    // Encrypt the delete code before storing
+    const encryptedCode = encryptCode(deleteCode);
+    
     const articleData = {
       title,
       author,
       content,
       tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
       timestamp: Date.now(),
-      views: 0
+      views: 0,
+      deleteCode: encryptedCode  // Store encrypted code
     };
     
     await push(ref(db, 'articles/'), articleData);
     
-    showAlert('Article published successfully!');
+    showAlert('✅ Article published successfully! Remember your delete code!');
     uploadForm.reset();
   } catch (error) {
     console.error('Error publishing article:', error);
-    showAlert('Failed to publish article. Please try again.', 'error');
+    showAlert('❌ Failed to publish article. Please try again.', 'error');
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Publish Article';
