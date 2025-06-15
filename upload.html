@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Articles | Article CMS</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-okaidia.min.css" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <nav>
+      <h1>📚 Article CMS</h1>
+      <div class="nav-links">
+        <a href="upload.html">Upload</a>
+        <a href="articles.html" class="active">Articles</a>
+        <a href="about.html">About</a>
+      </div>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <h2 class="page-title">📘 Public Articles</h2>
+    
+    <div class="form-group" style="max-width: 400px; margin: 0 auto 2rem;">
+      <input type="text" id="searchInput" placeholder="Search articles...">
+    </div>
+    
+    <div id="articles"></div>
+    
+    <div id="loadingIndicator" style="text-align: center; padding: 2rem;">
+      <div style="display: inline-block; padding: 1rem; background: white; border-radius: 8px;">
+        Loading articles...
+      </div>
+    </div>
+  </div>
+
+  <script src="articles.js" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
