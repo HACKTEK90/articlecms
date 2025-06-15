@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Article | Article CMS</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <h1>📚 Article CMS</h1>
+      <div class="nav-links">
+        <a href="upload.html" class="active">Upload</a>
+        <a href="articles.html">Articles</a>
+        <a href="about.html">About</a>
+      </div>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <h2 class="page-title">🛠️ Upload New Article</h2>
+    
+    <div id="alertContainer"></div>
+    
+    <div class="form-container">
+      <form id="uploadForm">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" placeholder="Enter article title" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="author">Author</label>
+          <input type="text" id="author" placeholder="Your name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="tags">Tags (comma separated)</label>
+          <input type="text" id="tags" placeholder="e.g. javascript, webdev, tutorial">
+        </div>
+        
+        <div class="form-group">
+          <label for="content">Content</label>
+          <textarea id="content" placeholder="Write your article content here. Use ``` to wrap code blocks." required></textarea>
+          <div class="text-muted text-small mt-3">
+            💡 <strong>Tip:</strong> Use <code>```language</code> for syntax highlighting (e.g. <code>```javascript</code>). 
+            Supported languages: JavaScript, Python, HTML, CSS, etc.
+          </div>
+        </div>
+        
+        <div class="d-flex justify-between">
+          <button type="reset" class="btn btn-secondary">Clear</button>
+          <button type="submit" class="btn" id="submitBtn">Publish Article</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="upload.js" type="module"></script>
+</body>
+</html>
